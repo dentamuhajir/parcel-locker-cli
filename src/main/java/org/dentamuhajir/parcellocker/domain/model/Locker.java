@@ -29,6 +29,14 @@ import java.util.Queue;
             return assignedUser == null;
         }
 
+        public boolean isReserved() {
+            return assignedUser != null;
+        }
+
+        public User getAssignedUserOrNull() {
+            return assignedUser;
+        }
+
         public void assign(User user) {
             this.assignedUser = user;
         }

@@ -91,10 +91,20 @@ public class CommandRouter {
                     .getAllLockers()
                     .forEach(locker -> {
 
-                        String status =
-                                locker.isAvailable()
-                                        ? "AVAILABLE"
-                                        : "RESERVED";
+                        String status;
+
+                        if (locker.isAvailable()) {
+
+                            status = "AVAILABLE";
+
+                        } else {
+
+                            status =
+                                    "RESERVED by "
+                                            + locker.getAssignedUser()
+                                            .map(User::getUsername)
+                                            .orElse("UNKNOWN");
+                        }
 
                         System.out.println(
                                 locker.getLockerId()
@@ -102,6 +112,42 @@ public class CommandRouter {
                                         + status
                         );
                     });
+
+            return true;
+        }
+
+        if (command.startsWith("reserve ")) {
+
+            if (!authService.isLoggedIn()) {
+                System.out.println("Please login first.");
+                return true;
+            }
+
+            String lockerId =
+                    command.substring(8).trim();
+
+            User currentUser =
+                    authService.getCurrentUser();
+
+            try {
+
+                lockerService.reserveLocker(
+                        lockerId,
+                        currentUser
+                );
+
+                System.out.println(
+                        "Locker "
+                                + lockerId
+                                + " has been reserved for you."
+                );
+
+            } catch (IllegalArgumentException e) {
+
+                System.out.println(
+                        e.getMessage()
+                );
+            }
 
             return true;
         }
@@ -166,6 +212,7 @@ public class CommandRouter {
         System.out.println("logout");
         System.out.println("whoami");
         System.out.println("add-locker <locker-id>");
+        System.out.println("reserve <locker-id>");
         System.out.println("list-lockers");
         System.out.println("help");
         System.out.println("exit");

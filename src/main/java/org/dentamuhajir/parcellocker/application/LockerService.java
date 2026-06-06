@@ -2,6 +2,7 @@ package org.dentamuhajir.parcellocker.application;
 
 
 import org.dentamuhajir.parcellocker.domain.model.Locker;
+import org.dentamuhajir.parcellocker.domain.model.User;
 import org.dentamuhajir.parcellocker.domain.repository.LockerRepository;
 
 import java.util.List;
@@ -10,9 +11,7 @@ public class LockerService {
 
     private final LockerRepository lockerRepository;
 
-    public LockerService(
-            LockerRepository lockerRepository
-    ) {
+    public LockerService(LockerRepository lockerRepository) {
         this.lockerRepository = lockerRepository;
     }
 
@@ -31,5 +30,24 @@ public class LockerService {
 
     public List<Locker> getAllLockers() {
         return lockerRepository.findAll();
+    }
+
+    public void reserveLocker(String lockerId, User user) {
+
+        Locker locker = lockerRepository
+                .findById(lockerId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Locker not found."
+                        )
+                );
+
+        if (!locker.isAvailable()) {
+            throw new IllegalArgumentException(
+                    "Locker is already reserved."
+            );
+        }
+
+        locker.assign(user);
     }
 }

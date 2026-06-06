@@ -48,4 +48,28 @@ import java.util.Queue;
         public Queue<User> getWaitingQueue() {
             return waitingQueue;
         }
+
+        public void addToQueue(User user) {
+            if (waitingQueue.contains(user)) {
+                throw new IllegalArgumentException(
+                        "User is already in queue."
+                );
+            }
+            waitingQueue.offer(user);
+        }
+
+        public boolean isUserQueued(User user) {
+            return waitingQueue.contains(user);
+        }
+
+        public int getQueuePosition(User user) {
+            int position = 1;
+            for (User queuedUser : waitingQueue) {
+                if (queuedUser.equals(user)) {
+                    return position;
+                }
+                position++;
+            }
+            return -1;
+        }
     }

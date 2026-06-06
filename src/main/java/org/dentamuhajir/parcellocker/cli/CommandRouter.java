@@ -152,6 +152,42 @@ public class CommandRouter {
             return true;
         }
 
+        if (command.startsWith("queue ")) {
+
+            if (!authService.isLoggedIn()) {
+
+                System.out.println(
+                        "Please login first."
+                );
+
+                return true;
+            }
+
+            String lockerId =
+                    command.substring(6).trim();
+
+            try {
+
+                lockerService.joinQueue(
+                        lockerId,
+                        authService.getCurrentUser()
+                );
+
+                System.out.println(
+                        "Added to waiting queue for locker "
+                                + lockerId
+                );
+
+            } catch (IllegalArgumentException e) {
+
+                System.out.println(
+                        e.getMessage()
+                );
+            }
+
+            return true;
+        }
+
         switch (command.toLowerCase()) {
 
             case "logout":
@@ -214,6 +250,7 @@ public class CommandRouter {
         System.out.println("add-locker <locker-id>");
         System.out.println("reserve <locker-id>");
         System.out.println("list-lockers");
+        System.out.println("queue <locker-id>");
         System.out.println("help");
         System.out.println("exit");
         System.out.println();

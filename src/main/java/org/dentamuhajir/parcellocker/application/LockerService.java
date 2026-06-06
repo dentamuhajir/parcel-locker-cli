@@ -50,4 +50,22 @@ public class LockerService {
 
         locker.assign(user);
     }
+
+    public void joinQueue(String lockerId, User user) {
+
+        Locker locker = lockerRepository.findById(lockerId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Locker not found."
+                        )
+                );
+
+        if (locker.isAvailable()) {
+            throw new IllegalArgumentException(
+                    "Locker is available. Reserve it directly."
+            );
+        }
+
+        locker.addToQueue(user);
+    }
 }

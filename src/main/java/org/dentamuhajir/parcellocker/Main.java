@@ -1,6 +1,11 @@
 package org.dentamuhajir.parcellocker;
 
+import org.dentamuhajir.parcellocker.application.AuthService;
 import org.dentamuhajir.parcellocker.cli.CommandRouter;
+import org.dentamuhajir.parcellocker.domain.model.User;
+import org.dentamuhajir.parcellocker.domain.repository.UserRepository;
+import org.dentamuhajir.parcellocker.infrastructure.memory.InMemoryUserRepository;
+import org.dentamuhajir.parcellocker.session.UserSession;
 
 import java.util.Scanner;
 
@@ -8,8 +13,8 @@ public class Main {
 
     public static void main(String[] args) {
 
+        CommandRouter commandRouter = createCommandRouter();
         Scanner scanner = new Scanner(System.in);
-        CommandRouter commandRouter = new CommandRouter();
 
         boolean running = true;
 
@@ -26,5 +31,22 @@ public class Main {
         }
 
         scanner.close();
+    }
+
+    private static CommandRouter createCommandRouter() {
+
+        UserRepository userRepository = new InMemoryUserRepository();
+
+        userRepository.save(new User("admin"));
+
+        UserSession userSession = new UserSession();
+
+        AuthService authService =
+                new AuthService(
+                        userRepository,
+                        userSession
+                );
+
+        return new CommandRouter(authService);
     }
 }

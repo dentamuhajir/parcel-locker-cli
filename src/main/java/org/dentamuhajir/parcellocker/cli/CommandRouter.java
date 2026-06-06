@@ -1,14 +1,18 @@
 package org.dentamuhajir.parcellocker.cli;
 
 import org.dentamuhajir.parcellocker.application.AuthService;
+import org.dentamuhajir.parcellocker.application.LockerService;
 import org.dentamuhajir.parcellocker.domain.model.User;
 
 public class CommandRouter {
 
     private final AuthService authService;
+    private final LockerService lockerService;
 
-    public CommandRouter(AuthService authService) {
+    public CommandRouter(AuthService authService, LockerService lockerService) {
         this.authService = authService;
+        this.lockerService = lockerService;
+
     }
 
     public boolean route(String command) {
@@ -31,6 +35,74 @@ public class CommandRouter {
             User user = authService.login(username);
 
             System.out.println("Hello, " + user.getUsername() + "!");
+            return true;
+        }
+
+        if (command.startsWith("add-locker ")) {
+
+            if (!authService.isLoggedIn()) {
+                System.out.println("Please login first.");
+                return true;
+            }
+
+            String username =
+                    authService.getCurrentUser()
+                            .getUsername();
+
+            if (!"admin".equalsIgnoreCase(username)) {
+                System.out.println(
+                        "Only admin can register lockers."
+                );
+                return true;
+            }
+
+            String lockerId =
+                    command.substring(11).trim();
+
+            try {
+
+                lockerService.addLocker(lockerId);
+
+                System.out.println(
+                        "Locker " + lockerId +
+                                " has been registered."
+                );
+
+            } catch (IllegalArgumentException e) {
+
+                System.out.println(e.getMessage());
+            }
+
+            return true;
+        }
+
+        if (command.equalsIgnoreCase("list-lockers")) {
+
+            if (lockerService.getAllLockers().isEmpty()) {
+
+                System.out.println(
+                        "No lockers registered."
+                );
+
+                return true;
+            }
+
+            lockerService
+                    .getAllLockers()
+                    .forEach(locker -> {
+
+                        String status =
+                                locker.isAvailable()
+                                        ? "AVAILABLE"
+                                        : "RESERVED";
+
+                        System.out.println(
+                                locker.getLockerId()
+                                        + " - "
+                                        + status
+                        );
+                    });
+
             return true;
         }
 
@@ -93,6 +165,8 @@ public class CommandRouter {
         System.out.println("login <user>");
         System.out.println("logout");
         System.out.println("whoami");
+        System.out.println("add-locker <locker-id>");
+        System.out.println("list-lockers");
         System.out.println("help");
         System.out.println("exit");
         System.out.println();

@@ -1,9 +1,12 @@
 package org.dentamuhajir.parcellocker;
 
 import org.dentamuhajir.parcellocker.application.AuthService;
+import org.dentamuhajir.parcellocker.application.LockerService;
 import org.dentamuhajir.parcellocker.cli.CommandRouter;
 import org.dentamuhajir.parcellocker.domain.model.User;
+import org.dentamuhajir.parcellocker.domain.repository.LockerRepository;
 import org.dentamuhajir.parcellocker.domain.repository.UserRepository;
+import org.dentamuhajir.parcellocker.infrastructure.memory.InMemoryLockerRepository;
 import org.dentamuhajir.parcellocker.infrastructure.memory.InMemoryUserRepository;
 import org.dentamuhajir.parcellocker.session.UserSession;
 
@@ -47,6 +50,14 @@ public class Main {
                         userSession
                 );
 
-        return new CommandRouter(authService);
+        LockerRepository lockerRepository = new InMemoryLockerRepository();
+
+        LockerService lockerService = new LockerService(lockerRepository);
+
+
+        return new CommandRouter(
+                authService,
+                lockerService
+        );
     }
 }

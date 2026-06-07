@@ -2,17 +2,19 @@ package org.dentamuhajir.parcellocker.cli;
 
 import org.dentamuhajir.parcellocker.application.AuthService;
 import org.dentamuhajir.parcellocker.application.LockerService;
+import org.dentamuhajir.parcellocker.application.StatusService;
 import org.dentamuhajir.parcellocker.domain.model.User;
 
 public class CommandRouter {
 
     private final AuthService authService;
     private final LockerService lockerService;
+    private final StatusService statusService;
 
-    public CommandRouter(AuthService authService, LockerService lockerService) {
+    public CommandRouter(AuthService authService, LockerService lockerService, StatusService statusService) {
         this.authService = authService;
         this.lockerService = lockerService;
-
+        this.statusService = statusService;
     }
 
     public boolean route(String command) {
@@ -234,6 +236,70 @@ public class CommandRouter {
             return true;
         }
 
+        if (command.equalsIgnoreCase("status")) {
+
+            if (!authService.isLoggedIn()) {
+
+                System.out.println(
+                        "Please login first."
+                );
+
+                return true;
+            }
+
+            User currentUser =
+                    authService.getCurrentUser();
+
+            System.out.println(
+                    "Assigned lockers:"
+            );
+
+            var assignedLockers =
+                    statusService.getAssignedLockers(
+                            currentUser
+                    );
+
+            if (assignedLockers.isEmpty()) {
+
+                System.out.println("None");
+
+            } else {
+
+                int index = 1;
+
+                for (String locker :
+                        assignedLockers) {
+
+                    System.out.println(
+                            index + ". " + locker
+                    );
+
+                    index++;
+                }
+            }
+
+            System.out.println();
+            System.out.println("Waiting queues:");
+
+            var queuePositions =
+                    statusService.getQueuePositions(
+                            currentUser
+                    );
+
+            if (queuePositions.isEmpty()) {
+
+                System.out.println("None");
+
+            } else {
+
+                queuePositions.forEach(
+                        System.out::println
+                );
+            }
+
+            return true;
+        }
+
         switch (command.toLowerCase()) {
 
             case "logout":
@@ -298,6 +364,7 @@ public class CommandRouter {
         System.out.println("list-lockers");
         System.out.println("queue <locker-id>");
         System.out.println("release <locker-id>");
+        System.out.println("status");
         System.out.println("help");
         System.out.println("exit");
         System.out.println();

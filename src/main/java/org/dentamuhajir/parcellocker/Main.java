@@ -2,6 +2,7 @@ package org.dentamuhajir.parcellocker;
 
 import org.dentamuhajir.parcellocker.application.AuthService;
 import org.dentamuhajir.parcellocker.application.LockerService;
+import org.dentamuhajir.parcellocker.application.StatusService;
 import org.dentamuhajir.parcellocker.cli.CommandRouter;
 import org.dentamuhajir.parcellocker.domain.model.User;
 import org.dentamuhajir.parcellocker.domain.repository.LockerRepository;
@@ -54,10 +55,12 @@ public class Main {
 
         LockerService lockerService = new LockerService(lockerRepository);
 
+        StatusService statusService = new StatusService(lockerRepository);
 
         return new CommandRouter(
                 authService,
-                lockerService
+                lockerService,
+                statusService
         );
     }
 }

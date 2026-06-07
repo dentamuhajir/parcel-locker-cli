@@ -4,6 +4,9 @@ import org.dentamuhajir.parcellocker.domain.model.User;
 import org.dentamuhajir.parcellocker.domain.repository.UserRepository;
 import org.dentamuhajir.parcellocker.session.UserSession;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -42,5 +45,24 @@ public class AuthService {
 
     public boolean isLoggedIn() {
         return userSession.isLoggedIn();
+    }
+
+    public List<String> consumeNotifications() {
+
+        if (!userSession.isLoggedIn()) {
+            return List.of();
+        }
+
+        User currentUser =
+                userSession.getCurrentUser();
+
+        List<String> notifications =
+                new ArrayList<>(
+                        currentUser.getNotifications()
+                );
+
+        currentUser.clearNotifications();
+
+        return notifications;
     }
 }

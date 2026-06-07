@@ -97,12 +97,17 @@ public class LockerService {
 
         locker.release();
 
-        User nextUser =
-                locker.pollNextQueuedUser();
+        User nextUser = locker.pollNextQueuedUser();
 
         if (nextUser != null) {
 
             locker.assign(nextUser);
+
+            nextUser.addNotification(
+                    "Locker "
+                            + lockerId
+                            + " has been automatically assigned to you."
+            );
 
             return nextUser.getUsername();
         }

@@ -37,6 +37,17 @@ public class CommandRouter {
             User user = authService.login(username);
 
             System.out.println("Hello, " + user.getUsername() + "!");
+            var notifications = authService.consumeNotifications();
+
+            for (String notification :
+                    notifications) {
+
+                System.out.println(
+                        "[NOTIFICATION] "
+                                + notification
+                );
+            }
+
             return true;
         }
 

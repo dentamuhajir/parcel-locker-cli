@@ -188,6 +188,52 @@ public class CommandRouter {
             return true;
         }
 
+        if (command.startsWith("release ")) {
+
+            if (!authService.isLoggedIn()) {
+
+                System.out.println(
+                        "Please login first."
+                );
+
+                return true;
+            }
+
+            String lockerId =
+                    command.substring(8).trim();
+
+            try {
+
+                String assignedUser =
+                        lockerService.releaseLocker(
+                                lockerId,
+                                authService.getCurrentUser()
+                        );
+
+                System.out.println(
+                        "Locker "
+                                + lockerId
+                                + " released."
+                );
+
+                if (assignedUser != null) {
+
+                    System.out.println(
+                            "Locker automatically assigned to "
+                                    + assignedUser
+                    );
+                }
+
+            } catch (IllegalArgumentException e) {
+
+                System.out.println(
+                        e.getMessage()
+                );
+            }
+
+            return true;
+        }
+
         switch (command.toLowerCase()) {
 
             case "logout":
@@ -251,6 +297,7 @@ public class CommandRouter {
         System.out.println("reserve <locker-id>");
         System.out.println("list-lockers");
         System.out.println("queue <locker-id>");
+        System.out.println("release <locker-id>");
         System.out.println("help");
         System.out.println("exit");
         System.out.println();

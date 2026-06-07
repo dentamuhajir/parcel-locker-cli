@@ -68,4 +68,45 @@ public class LockerService {
 
         locker.addToQueue(user);
     }
+
+    public String releaseLocker(String lockerId, User currentUser) {
+
+        Locker locker = lockerRepository
+                .findById(lockerId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Locker not found."
+                        )
+                );
+
+        if (locker.isAvailable()) {
+            throw new IllegalArgumentException(
+                    "Locker is already available."
+            );
+        }
+
+        User assignedUser = locker
+                .getAssignedUser()
+                .orElseThrow();
+
+        if (!assignedUser.equals(currentUser)) {
+            throw new IllegalArgumentException(
+                    "You do not own this locker."
+            );
+        }
+
+        locker.release();
+
+        User nextUser =
+                locker.pollNextQueuedUser();
+
+        if (nextUser != null) {
+
+            locker.assign(nextUser);
+
+            return nextUser.getUsername();
+        }
+
+        return null;
+    }
 }

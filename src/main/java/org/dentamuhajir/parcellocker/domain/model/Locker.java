@@ -72,4 +72,8 @@ import java.util.Queue;
             }
             return -1;
         }
+
+        public User pollNextQueuedUser() {
+            return waitingQueue.poll();
+        }
     }
